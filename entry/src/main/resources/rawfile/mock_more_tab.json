@@ -1,0 +1,19 @@
+{
+  "prefRows": [
+    { "id": "download_queue", "label": "Download queue",   "glyph": "↓" },
+    { "id": "categories",     "label": "Categories",       "glyph": "☰" },
+    { "id": "statistics",     "label": "Statistics",       "glyph": "📊", "routePath": "pages/StatisticsPage" },
+    { "id": "data_storage",   "label": "Data and storage", "glyph": "💾" },
+    { "id": "settings",       "label": "Settings",         "glyph": "⚙" },
+    { "id": "support_us",     "label": "Support Us",       "glyph": "♥" },
+    { "id": "about",          "label": "About",            "glyph": "ⓘ" },
+    { "id": "help",           "label": "Help",             "glyph": "?" }
+  ],
+  "bottomTabs": [
+    { "id": "library", "label": "Library", "glyph": "📚" },
+    { "id": "updates", "label": "Updates", "glyph": "↻" },
+    { "id": "history", "label": "History", "glyph": "⏱" },
+    { "id": "browse",  "label": "Browse",  "glyph": "🌐" },
+    { "id": "more",    "label": "More",    "glyph": "⋯" }
+  ]
+}
