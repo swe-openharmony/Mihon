@@ -1,24 +1,4 @@
-// ====================================================================
 // Page: MoreTabPage
-// App: Mihon
-// Reference samples:
-//   - D:/OH-Appforge/_hmos_samples/ComponentUXExamples (List + bottom tabs)
-//   - D:/OH-Appforge/spec_to_app/harmony/opus-4.7/Catima/entry/src/main/ets/pages/
-//     BarcodeSelectorPage.ets (proven layout pattern)
-// Android baseline screenshot:
-//   - D:/OH-Appforge/_doc_screenshots_v2/Mihon/L1_3_more.png
-// Android view tree:
-//   - D:/OH-Appforge/_doc_screenshots_v2/Mihon/L1_3_more.xml
-// Layout contract (from Android view.xml):
-//   - Two toggle rows at top:
-//       "Downloaded only" / "Filters all entries in your library" + switch
-//       "Incognito mode" / "Pauses reading history" + switch
-//   - Preference rows (label + chevron):
-//       Download queue, Categories, Statistics, Data and storage,
-//       Settings, Support Us, About, Help
-//   - Bottom navigation (5 tabs): Library, Updates, History, Browse, More (selected)
-// Status: ALIGNED to Android baseline.
-// ====================================================================
 
 import { router } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
@@ -58,7 +38,7 @@ struct MoreTabPage {
   @State private incognito: boolean = false;
   @State private selectedTab: string = 'more';
 
-  // Bottom navigation: 5 tabs matching Android baseline (More selected). Loaded from rawfile.
+  // Bottom navigation: 5 tabs (More selected). Loaded from rawfile.
   @State private tabs: NavTab[] = [];
 
   // Preference rows loaded from rawfile/mock_more_tab.json.

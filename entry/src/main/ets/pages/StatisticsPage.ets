@@ -1,17 +1,4 @@
-// ====================================================================
 // Page: StatisticsPage
-// App: Mihon
-// Android baseline:
-//   - D:/OH-Appforge/_doc_screenshots_v2/Mihon/L2_1_statistics.png
-//   - D:/OH-Appforge/_doc_screenshots_v2/Mihon/L2_1_statistics.xml
-// Layout contract:
-//   - Top bar: back (Text '<-') + "Statistics" title
-//   - Section "Overview" with 3 stat cells (value + label)
-//   - Section "Entries" with 3 cells
-//   - Section "Chapters" with 3 cells
-//   - Section "Trackers" with 3 cells
-//   - Plus chart placeholder built from styled bars (Catima-style)
-// ====================================================================
 
 import { router } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';

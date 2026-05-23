@@ -1,15 +1,4 @@
-// ====================================================================
-// Page: Index (Mihon L0 Home — Library main with empty-state)
-// Android baseline: D:/OH-Appforge/_doc_screenshots_v2/Mihon/L0_home.png
-// Layout contract:
-//   - Top app bar: "Library" title + Search/Filter/Overflow icons
-//   - Empty-state centered: stylized face glyph + "Your library is empty"
-//     + "Getting started guide" link
-//   - Bottom nav: 5 tabs — Library | Updates | History | Browse | More
-// Navigation:
-//   - Tap "More" tab → router.pushUrl('pages/MoreTabPage')
-//     (MoreTabPage already exposes Statistics row → StatisticsPage)
-// ====================================================================
+// Page: Index
 
 import { router } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
