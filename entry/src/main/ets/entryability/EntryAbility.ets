@@ -25,10 +25,21 @@ export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
     this.applyTargetFromWant(want);
+    this.captureTestParams(want);
+  }
+
+  // Deterministic test-mode library selector so 场景二/三 can be driven without an
+  // in-app library-management UI: aa start ... --ps libstate empty|alt
+  private captureTestParams(want: Want): void {
+    const params = want.parameters;
+    if (params && typeof params['libstate'] === 'string') {
+      AppStorage.SetOrCreate<string>('test_libstate', params['libstate'] as string);
+    }
   }
 
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onNewWant');
+    this.captureTestParams(want);
     const changed = this.applyTargetFromWant(want);
     if (changed && this.windowStage) {
       hilog.info(0x0000, 'testTag', 'onNewWant reloading content -> %{public}s', this.targetPage);

@@ -1,0 +1,7 @@
+{
+  "loggedInTrackers": 1,
+  "manga": [
+    { "id": 101, "source": "mangadex", "status": "ongoing",   "totalChapters": 60, "readChapters": 20, "downloadedChapters": 7, "globalUpdate": true,  "readTimeMinutes": 120, "tracked": true, "score": 5.0 },
+    { "id": 102, "source": "comick",   "status": "completed", "totalChapters": 63, "readChapters": 25, "downloadedChapters": 0, "globalUpdate": false, "readTimeMinutes": 0,   "tracked": true, "score": 5.0 }
+  ]
+}
