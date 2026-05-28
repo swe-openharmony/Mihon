@@ -2,6 +2,12 @@
     "src":  [
                 "pages/Index",
                 "pages/MoreTabPage",
-                "pages/StatisticsPage"
+                "pages/StatisticsPage",
+                "pages/SettingsPage",
+                "pages/AboutPage",
+                "pages/DataStoragePage",
+                "pages/CategoriesPage",
+                "pages/DownloadQueuePage",
+                "pages/SupportUsPage"
             ]
 }

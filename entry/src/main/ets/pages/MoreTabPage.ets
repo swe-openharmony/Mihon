@@ -2,9 +2,13 @@
 
 import { router } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { common, Want } from '@kit.AbilityKit';
 import { MockDataSource } from '../common/MockDataSource';
+import { Prefs, KEY_DOWNLOADED_ONLY, KEY_INCOGNITO } from '../common/Prefs';
+import { DownloadQueueState, downloadQueueSubtitle } from '../common/DownloadQueueStore';
 
 const TAG = 'MoreTabPage';
+const HELP_URL = 'https://mihon.app/docs/guides/troubleshooting/';
 
 interface MoreTabFile {
   prefRows: PrefRow[];
@@ -16,13 +20,6 @@ interface PrefRow {
   label: string;
   glyph: string;       // text glyph stand-in (we avoid sys.media.*)
   routePath?: string;
-}
-
-interface ToggleRow {
-  id: string;
-  label: string;
-  subtitle: string;
-  isOn: boolean;
 }
 
 interface NavTab {
@@ -38,6 +35,9 @@ struct MoreTabPage {
   @State private incognito: boolean = false;
   @State private selectedTab: string = 'more';
 
+  // Live download-queue state → drives the "Download queue" row subtitle.
+  @State private dlState: DownloadQueueState = new DownloadQueueState();
+
   // Bottom navigation: 5 tabs (More selected). Loaded from rawfile.
   @State private tabs: NavTab[] = [];
 
@@ -47,6 +47,13 @@ struct MoreTabPage {
   aboutToAppear(): void {
     hilog.info(0x0000, TAG, 'MoreTabPage mounted');
     this.loadMoreTab();
+    this.loadPrefs();
+  }
+
+  onPageShow(): void {
+    // Re-read on return from a pushed sub-page so toggles reflect the latest
+    // persisted values (spec 整页约束: 返回后开关反映最新持久化值).
+    this.loadPrefs();
   }
 
   private async loadMoreTab(): Promise<void> {
@@ -63,22 +70,50 @@ struct MoreTabPage {
     }
   }
 
-  private onToggleDownloadedOnly(on: boolean): void {
-    this.downloadedOnly = on;
-    hilog.info(0x0000, TAG, 'Downloaded only -> %{public}s', `${on}`);
+  private async loadPrefs(): Promise<void> {
+    try {
+      this.downloadedOnly = await Prefs.getBool(this, KEY_DOWNLOADED_ONLY, false);
+      this.incognito = await Prefs.getBool(this, KEY_INCOGNITO, false);
+    } catch (e) {
+      hilog.error(0x0000, TAG, 'prefs load failed: %{public}s', String(e));
+    }
   }
 
-  private onToggleIncognito(on: boolean): void {
-    this.incognito = on;
-    hilog.info(0x0000, TAG, 'Incognito -> %{public}s', `${on}`);
+  // Flip + persist. Each switch is symmetric and independent (spec 场景二).
+  private async flipDownloadedOnly(): Promise<void> {
+    const next = !this.downloadedOnly;
+    this.downloadedOnly = next;
+    hilog.info(0x0000, TAG, 'Downloaded only -> %{public}s', `${next}`);
+    await Prefs.setBool(this, KEY_DOWNLOADED_ONLY, next);
+  }
+
+  private async flipIncognito(): Promise<void> {
+    const next = !this.incognito;
+    this.incognito = next;
+    hilog.info(0x0000, TAG, 'Incognito -> %{public}s', `${next}`);
+    await Prefs.setBool(this, KEY_INCOGNITO, next);
+  }
+
+  private subtitleFor(row: PrefRow): string {
+    // Only the download-queue row carries a dynamic subtitle (spec 场景三).
+    return row.id === 'download_queue' ? downloadQueueSubtitle(this.dlState) : '';
   }
 
   private onRowClick(row: PrefRow): void {
+    if (row.id === 'help') {
+      // Help opens the external help site (spec 场景四: out of scope, but wired).
+      const ctx = getContext(this) as common.UIAbilityContext;
+      const want: Want = { action: 'ohos.want.action.viewData', uri: HELP_URL };
+      ctx.startAbility(want).catch((e: Object) => {
+        hilog.error(0x0000, TAG, 'open help failed: %{public}s', String(e));
+      });
+      return;
+    }
     if (row.routePath) {
       router.pushUrl({ url: row.routePath });
       return;
     }
-    hilog.info(0x0000, TAG, 'pref row tapped: %{public}s', row.id);
+    hilog.info(0x0000, TAG, 'pref row tapped (no route): %{public}s', row.id);
   }
 
   private onTabClick(tab: NavTab): void {
@@ -87,7 +122,7 @@ struct MoreTabPage {
   }
 
   @Builder
-  private ToggleRowView(label: string, subtitle: string, isOn: boolean, onChange: (v: boolean) => void) {
+  private ToggleRowView(id: string, label: string, subtitle: string) {
     Row() {
       Column() {
         Text(label)
@@ -102,12 +137,23 @@ struct MoreTabPage {
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1);
 
-      Toggle({ type: ToggleType.Switch, isOn: isOn })
-        .onChange((v: boolean) => onChange(v));
+      // isOn reads the @State DIRECTLY inside the @Builder (not via a value
+      // param) so it stays reactive — a value-type @Builder param would not
+      // re-render the Toggle when the state flips. Display-only: taps pass
+      // through to the row so the whole row triggers one flip path (场景二).
+      Toggle({ type: ToggleType.Switch, isOn: id === 'incognito' ? this.incognito : this.downloadedOnly })
+        .hitTestBehavior(HitTestMode.None);
     }
     .width('100%')
     .padding({ left: 24, right: 24, top: 16, bottom: 16 })
-    .alignItems(VerticalAlign.Center);
+    .alignItems(VerticalAlign.Center)
+    .onClick(() => {
+      if (id === 'incognito') {
+        this.flipIncognito();
+      } else {
+        this.flipDownloadedOnly();
+      }
+    });
   }
 
   @Builder
@@ -120,13 +166,24 @@ struct MoreTabPage {
         .textAlign(TextAlign.Center)
         .margin({ left: 16 });
 
-      Text(row.label)
-        .fontSize(16)
-        .fontColor('#1F1F1F')
-        .layoutWeight(1);
+      Column() {
+        Text(row.label)
+          .fontSize(16)
+          .fontColor('#1F1F1F');
+        // Dynamic subtitle: rendered only when non-empty (download-queue, N>0).
+        if (this.subtitleFor(row).length > 0) {
+          Text(this.subtitleFor(row))
+            .fontSize(13)
+            .fontColor('#666666')
+            .margin({ top: 2 });
+        }
+      }
+      .alignItems(HorizontalAlign.Start)
+      .layoutWeight(1);
     }
     .width('100%')
-    .height(56)
+    .constraintSize({ minHeight: 56 })
+    .padding({ top: 8, bottom: 8 })
     .alignItems(VerticalAlign.Center)
     .backgroundColor('#FFFFFF')
     .onClick(() => this.onRowClick(row));
@@ -163,16 +220,14 @@ struct MoreTabPage {
       Scroll() {
         Column() {
           this.ToggleRowView(
+            'downloaded_only',
             'Downloaded only',
-            'Filters all entries in your library',
-            this.downloadedOnly,
-            (v: boolean) => this.onToggleDownloadedOnly(v)
+            'Filters all entries in your library'
           );
           this.ToggleRowView(
+            'incognito',
             'Incognito mode',
-            'Pauses reading history',
-            this.incognito,
-            (v: boolean) => this.onToggleIncognito(v)
+            'Pauses reading history'
           );
 
           // Divider before preference rows.

@@ -1,12 +1,12 @@
 {
   "prefRows": [
-    { "id": "download_queue", "label": "Download queue",   "glyph": "↓" },
-    { "id": "categories",     "label": "Categories",       "glyph": "☰" },
+    { "id": "download_queue", "label": "Download queue",   "glyph": "↓", "routePath": "pages/DownloadQueuePage" },
+    { "id": "categories",     "label": "Categories",       "glyph": "☰", "routePath": "pages/CategoriesPage" },
     { "id": "statistics",     "label": "Statistics",       "glyph": "📊", "routePath": "pages/StatisticsPage" },
-    { "id": "data_storage",   "label": "Data and storage", "glyph": "💾" },
-    { "id": "settings",       "label": "Settings",         "glyph": "⚙" },
-    { "id": "support_us",     "label": "Support Us",       "glyph": "♥" },
-    { "id": "about",          "label": "About",            "glyph": "ⓘ" },
+    { "id": "data_storage",   "label": "Data and storage", "glyph": "💾", "routePath": "pages/DataStoragePage" },
+    { "id": "settings",       "label": "Settings",         "glyph": "⚙", "routePath": "pages/SettingsPage" },
+    { "id": "support_us",     "label": "Support Us",       "glyph": "♥", "routePath": "pages/SupportUsPage" },
+    { "id": "about",          "label": "About",            "glyph": "ⓘ", "routePath": "pages/AboutPage" },
     { "id": "help",           "label": "Help",             "glyph": "?" }
   ],
   "bottomTabs": [
