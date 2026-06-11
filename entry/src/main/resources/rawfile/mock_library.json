@@ -1,0 +1,11 @@
+{
+  "loggedInTrackers": 3,
+  "manga": [
+    { "id": 1, "source": "mangadex", "status": "completed", "totalChapters": 120, "readChapters": 120, "downloadedChapters": 10, "globalUpdate": true,  "readTimeMinutes": 840, "tracked": true,  "score": 8.5 },
+    { "id": 2, "source": "mangadex", "status": "ongoing",   "totalChapters": 200, "readChapters": 50,  "downloadedChapters": 20, "globalUpdate": true,  "readTimeMinutes": 300, "tracked": true,  "score": 7.0 },
+    { "id": 3, "source": "local",    "status": "completed", "totalChapters": 30,  "readChapters": 0,   "downloadedChapters": 0,  "globalUpdate": false, "readTimeMinutes": 0,   "tracked": false, "score": 0 },
+    { "id": 4, "source": "comick",   "status": "ongoing",   "totalChapters": 80,  "readChapters": 80,  "downloadedChapters": 5,  "globalUpdate": true,  "readTimeMinutes": 600, "tracked": true,  "score": 9.0 },
+    { "id": 5, "source": "local",    "status": "ongoing",   "totalChapters": 15,  "readChapters": 3,   "downloadedChapters": 0,  "globalUpdate": false, "readTimeMinutes": 45,  "tracked": false, "score": 0 },
+    { "id": 6, "source": "mangadex", "status": "completed", "totalChapters": 45,  "readChapters": 45,  "downloadedChapters": 45, "globalUpdate": true,  "readTimeMinutes": 330, "tracked": true,  "score": 6.5 }
+  ]
+}
