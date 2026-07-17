@@ -1,0 +1,36 @@
+{
+  "sections": [
+    {
+      "title": "Overview",
+      "cells": [
+        { "value": "1234",  "label": "In library" },
+        { "value": "12d 4h","label": "Read duration" },
+        { "value": "237",   "label": "Completed entries" }
+      ]
+    },
+    {
+      "title": "Entries",
+      "cells": [
+        { "value": "12", "label": "In global update" },
+        { "value": "48", "label": "Started" },
+        { "value": "5",  "label": "Local" }
+      ]
+    },
+    {
+      "title": "Chapters",
+      "cells": [
+        { "value": "8432", "label": "Total" },
+        { "value": "6120", "label": "Read" },
+        { "value": "210",  "label": "Downloaded" }
+      ]
+    },
+    {
+      "title": "Trackers",
+      "cells": [
+        { "value": "32",  "label": "Tracked entries" },
+        { "value": "7.8", "label": "Mean score" },
+        { "value": "3",   "label": "Used" }
+      ]
+    }
+  ]
+}
