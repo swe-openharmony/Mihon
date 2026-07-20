@@ -2,47 +2,34 @@
 
 import { router } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { MockDataSource } from '../common/MockDataSource';
+import { StatisticsRepo, StatCell, StatSection } from '../common/StatisticsRepo';
 
 const TAG = 'StatisticsPage';
-
-interface StatCell {
-  value: string;
-  label: string;
-}
-
-interface StatSection {
-  title: string;
-  cells: StatCell[];
-}
-
-interface StatisticsFile {
-  sections: StatSection[];
-}
 
 @Entry
 @Component
 struct StatisticsPage {
   @State private sections: StatSection[] = [];
-
-  // Deterministic mock heights for the per-source bar chart placeholder.
-  private chartBars: number[] = [120, 80, 160, 60, 100, 140, 90];
-  private chartLabels: string[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  @State private loading: boolean = true;
 
   aboutToAppear(): void {
     hilog.info(0x0000, TAG, 'StatisticsPage mounted');
-    this.loadSections();
+    this.loadStats();
   }
 
-  private async loadSections(): Promise<void> {
+  // Recompute on every entry so the values reflect the current library
+  // (spec 场景二: re-entering after the library changes shows new values).
+  private async loadStats(): Promise<void> {
+    this.loading = true;
     try {
-      const data = await MockDataSource.loadJson<StatisticsFile>(this, 'mock_statistics.json');
-      this.sections = data.sections;
-      hilog.info(0x0000, TAG, 'loaded %{public}d stat sections from rawfile', this.sections.length);
+      const lib = StatisticsRepo.loadLibrary();
+      this.sections = StatisticsRepo.aggregate(lib);
+      hilog.info(0x0000, TAG, 'aggregated %{public}d sections from library', this.sections.length);
     } catch (e) {
       hilog.error(0x0000, TAG, 'load failed: %{public}s', String(e));
       this.sections = [];
     }
+    this.loading = false;
   }
 
   private onBack(): void {
@@ -56,6 +43,7 @@ struct StatisticsPage {
         Text('←').fontSize(22).fontColor('#1F1F1F');
       }
       .width(40).height(40).backgroundColor(Color.Transparent)
+      .key('navigate_up')
       .accessibilityText('Navigate up')
       .onClick(() => this.onBack());
 
@@ -74,8 +62,9 @@ struct StatisticsPage {
   }
 
   @Builder
-  private SectionTitle(title: string) {
+  private SectionTitle(title: string, index: number) {
     Text(title)
+      .key(`stat_section_${index}`)
       .fontSize(16)
       .fontWeight(FontWeight.Bold)
       .fontColor('#1F1F1F')
@@ -88,10 +77,12 @@ struct StatisticsPage {
       ForEach(cells, (cell: StatCell, idx: number) => {
         Column() {
           Text(cell.value)
+            .key(cell.key)
             .fontSize(22)
             .fontWeight(FontWeight.Bold)
             .fontColor('#1F1F1F');
           Text(cell.label)
+            .key(`${cell.key}_label`)
             .fontSize(13)
             .fontColor('#666666')
             .margin({ top: 6 })
@@ -107,66 +98,51 @@ struct StatisticsPage {
     .backgroundColor('#F6F6F6');
   }
 
-  @Builder
-  private ChartPlaceholder() {
-    Column() {
-      Text('Read per day')
-        .fontSize(14)
-        .fontColor('#666666')
-        .alignSelf(ItemAlign.Start)
-        .margin({ bottom: 12 });
-
-      Row() {
-        ForEach(this.chartBars, (h: number, idx: number) => {
-          Column() {
-            Column()
-              .width(20)
-              .height(h)
-              .borderRadius(4)
-              .backgroundColor('#1976D2');
-            Text(this.chartLabels[idx])
-              .fontSize(11)
-              .fontColor('#666666')
-              .margin({ top: 6 });
-          }
-          .layoutWeight(1)
-          .alignItems(HorizontalAlign.Center)
-          .justifyContent(FlexAlign.End);
-        }, (_h: number, idx: number) => `bar_${idx}`);
-      }
-      .width('100%')
-      .height(180)
-      .alignItems(VerticalAlign.Bottom);
-    }
-    .width('100%')
-    .margin({ left: 16, right: 16, top: 16 })
-    .padding(16)
-    .borderRadius(12)
-    .backgroundColor('#F6F6F6');
-  }
-
   build() {
     Column() {
+      Text('').key('page_statistics').height(0);
       this.TopBar();
 
-      Scroll() {
+      if (this.loading) {
+        // Loading state while the live owner is aggregated.
         Column() {
-          ForEach(this.sections, (sec: StatSection) => {
-            this.SectionTitle(sec.title);
-            this.StatRow(sec.cells);
-          }, (sec: StatSection) => sec.title);
-
-          this.ChartPlaceholder();
-
-          // Spacer at bottom
-          Column().width('100%').height(40);
+          Text('').key('statistics_loading').height(0);
+          LoadingProgress().width(48).height(48).color('#1976D2');
+          Text('Loading…').fontSize(14).fontColor('#666666').margin({ top: 12 });
         }
         .width('100%')
-        .alignItems(HorizontalAlign.Start);
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.Center)
+        .alignItems(HorizontalAlign.Center);
+      } else {
+        Scroll() {
+          Column() {
+            ForEach(this.sections, (sec: StatSection, index: number) => {
+              this.SectionTitle(sec.title, index);
+              this.StatRow(sec.cells);
+            }, (sec: StatSection) => sec.title);
+
+            // Bottom spacer
+            Column().width('100%').height(40);
+          }
+          .width('100%')
+          .alignItems(HorizontalAlign.Start);
+        }
+        .layoutWeight(1)
+        .width('100%')
+        .scrollBar(BarState.Auto);
       }
-      .layoutWeight(1)
+      Row() {
+        Text('Library').layoutWeight(1).textAlign(TextAlign.Center);
+        Text('Updates').layoutWeight(1).textAlign(TextAlign.Center);
+        Text('History').layoutWeight(1).textAlign(TextAlign.Center);
+        Text('Browse').layoutWeight(1).textAlign(TextAlign.Center);
+        Text('More').key('nav_more_selected').layoutWeight(1).textAlign(TextAlign.Center).fontColor('#1976D2');
+      }
       .width('100%')
-      .scrollBar(BarState.Auto);
+      .height(64)
+      .alignItems(VerticalAlign.Center)
+      .backgroundColor('#FFFFFF');
     }
     .width('100%')
     .height('100%')

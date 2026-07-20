@@ -125,19 +125,12 @@ struct MoreTabPage {
         .textAlign(TextAlign.Center)
         .margin({ left: 16 });
 
-      Column() {
-        Text(row.label)
-          .fontSize(16)
-          .fontColor('#1F1F1F');
-        if (row.id === 'download_queue') {
-          // Public subtitle slot/hit geometry. Queue observation and the N == 0
-          // suppression rule are intentionally absent from the UI-only Base.
-          Text('1 remaining').fontSize(13).fontColor('#666666');
-        }
-      }
-      .alignItems(HorizontalAlign.Start)
-      .layoutWeight(1);
+      Text(row.label)
+        .fontSize(16)
+        .fontColor('#1F1F1F')
+        .layoutWeight(1);
     }
+    .key(`row_${row.id}`)
     .width('100%')
     .height(56)
     .alignItems(VerticalAlign.Center)
@@ -154,6 +147,7 @@ struct MoreTabPage {
             .fontSize(20)
             .fontColor(this.selectedTab === tab.id ? '#1976D2' : '#666666');
           Text(tab.label)
+            .key(tab.id === 'more' && this.selectedTab === 'more' ? 'nav_more_selected' : `nav_${tab.id}`)
             .fontSize(11)
             .fontColor(this.selectedTab === tab.id ? '#1976D2' : '#666666')
             .margin({ top: 2 });
@@ -172,6 +166,7 @@ struct MoreTabPage {
 
   build() {
     Column() {
+      Text('').key('page_more').height(0);
       // Scrollable content area.
       Scroll() {
         Column() {

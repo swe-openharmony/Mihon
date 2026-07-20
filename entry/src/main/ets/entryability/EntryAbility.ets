@@ -2,6 +2,7 @@ import UIAbility from '@ohos.app.ability.UIAbility';
 import hilog from '@ohos.hilog';
 import window from '@ohos.window';
 import { AbilityConstant, Want } from '@kit.AbilityKit';
+import { LibraryStore } from '../common/LibraryStore';
 
 export default class EntryAbility extends UIAbility {
   // Active page; can be overridden via `aa start ... --ps targetPage <PageName>`.
@@ -25,12 +26,26 @@ export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
     this.applyTargetFromWant(want);
+    this.captureTestParams(want);
+  }
+
+  // Hidden setup seam: establish the same clean empty owner observed on frozen
+  // Android without exposing synthetic fixture controls in the public Library UI.
+  private captureTestParams(want: Want): void {
+    const params = want.parameters;
+    if (params && params['fixture_action'] === 'library_clear') {
+      LibraryStore.clearLibrary();
+    } else if (params && params['fixture_action'] === 'library_local_read') {
+      LibraryStore.seedLocalRead();
+    }
   }
 
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onNewWant');
-    const changed = this.applyTargetFromWant(want);
-    if (changed && this.windowStage) {
+    this.captureTestParams(want);
+    this.applyTargetFromWant(want);
+    const hasExplicitTarget = want.parameters && typeof want.parameters['targetPage'] === 'string';
+    if (hasExplicitTarget && this.windowStage) {
       hilog.info(0x0000, 'testTag', 'onNewWant reloading content -> %{public}s', this.targetPage);
       this.windowStage.loadContent(this.targetPage, (err) => {
         if (err.code) {
