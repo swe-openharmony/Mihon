@@ -2,6 +2,7 @@
 
 import { router } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { RetainedBottomNav } from '../common/RetainedBottomNav';
 import { MockDataSource } from '../common/MockDataSource';
 
 const TAG = 'StatisticsPage';
@@ -56,10 +57,12 @@ struct StatisticsPage {
         Text('←').fontSize(22).fontColor('#1F1F1F');
       }
       .width(40).height(40).backgroundColor(Color.Transparent)
+      .key('navigate_up')
       .accessibilityText('Navigate up')
       .onClick(() => this.onBack());
 
       Text('Statistics')
+        .key('page_statistics')
         .fontSize(20)
         .fontWeight(FontWeight.Medium)
         .fontColor('#1F1F1F')
@@ -167,6 +170,7 @@ struct StatisticsPage {
       .layoutWeight(1)
       .width('100%')
       .scrollBar(BarState.Auto);
+      RetainedBottomNav();
     }
     .width('100%')
     .height('100%')

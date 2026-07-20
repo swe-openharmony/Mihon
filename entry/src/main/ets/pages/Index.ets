@@ -111,6 +111,7 @@ struct Index {
             .fontSize(11)
             .fontColor(this.currentTab === tab.id ? '#3A5BCF' : '#555555');
         }
+        .key(`nav_${tab.id}`)
         .layoutWeight(1)
         .height(60)
         .justifyContent(FlexAlign.Center)
@@ -125,6 +126,7 @@ struct Index {
 
   build() {
     Column() {
+      Text('').key('page_library').height(0);
       this.TopBar();
       this.EmptyState();
       this.BottomNav();

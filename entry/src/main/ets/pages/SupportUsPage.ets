@@ -2,6 +2,7 @@
 
 import { router } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { RetainedBottomNav } from '../common/RetainedBottomNav';
 
 const TAG = 'SupportUsPage';
 
@@ -19,10 +20,12 @@ struct SupportUsPage {
         Text('←').fontSize(22).fontColor('#1F1F1F');
       }
       .width(40).height(40).backgroundColor(Color.Transparent)
+      .key('navigate_up')
       .accessibilityText('Navigate up')
       .onClick(() => router.back());
 
       Text('Support Us')
+        .key('page_support_us')
         .fontSize(20).fontWeight(FontWeight.Medium).fontColor('#1F1F1F')
         .layoutWeight(1).margin({ left: 16 });
     }
@@ -45,6 +48,7 @@ struct SupportUsPage {
       }
       .layoutWeight(1).width('100%')
       .justifyContent(FlexAlign.Center).alignItems(HorizontalAlign.Center);
+      RetainedBottomNav();
     }
     .width('100%').height('100%').backgroundColor('#FFFFFF');
   }

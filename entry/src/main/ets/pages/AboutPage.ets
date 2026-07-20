@@ -2,6 +2,7 @@
 
 import { router } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { RetainedBottomNav } from '../common/RetainedBottomNav';
 
 const TAG = 'AboutPage';
 
@@ -32,10 +33,12 @@ struct AboutPage {
         Text('←').fontSize(22).fontColor('#1F1F1F');
       }
       .width(40).height(40).backgroundColor(Color.Transparent)
+      .key('navigate_up')
       .accessibilityText('Navigate up')
       .onClick(() => router.back());
 
       Text('About')
+        .key('page_about')
         .fontSize(20)
         .fontWeight(FontWeight.Medium)
         .fontColor('#1F1F1F')
@@ -71,6 +74,7 @@ struct AboutPage {
       .layoutWeight(1)
       .width('100%')
       .divider({ strokeWidth: 0.5, color: '#F0F0F0' });
+      RetainedBottomNav();
     }
     .width('100%')
     .height('100%')

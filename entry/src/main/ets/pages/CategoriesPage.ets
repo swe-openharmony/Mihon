@@ -2,6 +2,7 @@
 
 import { router } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { RetainedBottomNav } from '../common/RetainedBottomNav';
 
 const TAG = 'CategoriesPage';
 
@@ -19,10 +20,12 @@ struct CategoriesPage {
         Text('←').fontSize(22).fontColor('#1F1F1F');
       }
       .width(40).height(40).backgroundColor(Color.Transparent)
+      .key('navigate_up')
       .accessibilityText('Navigate up')
       .onClick(() => router.back());
 
       Text('Categories')
+        .key('page_categories')
         .fontSize(20).fontWeight(FontWeight.Medium).fontColor('#1F1F1F')
         .layoutWeight(1).margin({ left: 16 });
     }
@@ -39,6 +42,7 @@ struct CategoriesPage {
       }
       .layoutWeight(1).width('100%')
       .justifyContent(FlexAlign.Center).alignItems(HorizontalAlign.Center);
+      RetainedBottomNav();
     }
     .width('100%').height('100%').backgroundColor('#FFFFFF');
   }

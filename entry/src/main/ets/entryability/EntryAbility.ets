@@ -25,10 +25,12 @@ export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
     this.applyTargetFromWant(want);
+    this.applyFixtureFromWant(want);
   }
 
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onNewWant');
+    this.applyFixtureFromWant(want);
     const changed = this.applyTargetFromWant(want);
     if (changed && this.windowStage) {
       hilog.info(0x0000, 'testTag', 'onNewWant reloading content -> %{public}s', this.targetPage);
@@ -38,6 +40,23 @@ export default class EntryAbility extends UIAbility {
         }
       });
     }
+  }
+
+  private applyFixtureFromWant(want: Want): void {
+    const params = want.parameters;
+    if (!params || typeof params['fixture_action'] !== 'string') {
+      return;
+    }
+    const action: string = params['fixture_action'] as string;
+    if (!action.startsWith('queue_')) {
+      return;
+    }
+    let pending: number = 0;
+    if (typeof params['queue_pending'] === 'string') {
+      pending = Number(params['queue_pending'] as string);
+    }
+    AppStorage.SetOrCreate<string>('queue_mode', action.replace('queue_', ''));
+    AppStorage.SetOrCreate<number>('queue_pending', pending);
   }
 
   private applyTargetFromWant(want: Want): boolean {
