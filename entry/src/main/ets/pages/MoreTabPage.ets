@@ -130,8 +130,8 @@ struct MoreTabPage {
           .fontSize(16)
           .fontColor('#1F1F1F');
         if (row.id === 'download_queue') {
-          // Public subtitle slot/hit geometry. Queue observation and the N == 0
-          // suppression rule are intentionally absent from the UI-only Base.
+          // Preserve the exact Base shell. This Statistics-only Gold must not
+          // implement the separate empty-queue subtitle contract.
           Text('1 remaining').fontSize(13).fontColor('#666666');
         }
       }

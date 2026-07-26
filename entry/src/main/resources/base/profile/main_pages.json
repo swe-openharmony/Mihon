@@ -8,6 +8,9 @@
                 "pages/DataStoragePage",
                 "pages/CategoriesPage",
                 "pages/DownloadQueuePage",
-                "pages/SupportUsPage"
+                "pages/SupportUsPage",
+                "pages/LocalSourcePage",
+                "pages/LocalTitlePage",
+                "pages/ReaderPage"
             ]
 }
